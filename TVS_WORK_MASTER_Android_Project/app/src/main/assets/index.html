@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b5121b">
+<link rel="manifest" href="manifest.json">
+<title>TVS WORK MASTER</title>
+<style>
+:root{--red:#b5121b;--dark:#17191f;--bg:#f3f4f6;--card:#fff;--muted:#69707d;--line:#e3e5e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--dark)}
+header{background:linear-gradient(135deg,#a30d16,#e02a32);color:white;padding:22px 18px 18px;border-radius:0 0 22px 22px}
+header .brand{font-size:12px;letter-spacing:2px;opacity:.9;font-weight:bold}header h1{font-size:25px;margin:7px 0 4px}header p{margin:0;font-size:13px;opacity:.9}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:12px}
+nav button{border:0;border-radius:10px;background:white;padding:11px 5px;font-weight:bold;color:#4c515b;box-shadow:0 1px 4px #0000000b}
+nav button.active{background:var(--dark);color:white}
+main{padding:0 12px 28px;max-width:720px;margin:auto}.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);padding:15px;border-radius:15px;margin:0 0 12px;box-shadow:0 2px 9px #11111108}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 9px}
+label{display:block;font-size:12px;font-weight:bold;color:#555d69;margin:10px 0 5px}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;font:inherit;font-size:14px;color:var(--dark)}
+textarea{min-height:70px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button.primary,.primary{background:var(--red);color:white;border:0;border-radius:10px;padding:12px 14px;font-weight:bold;width:100%;margin-top:12px}
+button.secondary{background:#eceef1;border:0;border-radius:9px;padding:10px 12px;font-weight:bold}
+.small{font-size:12px;color:var(--muted)}.price{font-weight:bold;font-size:18px}.total{font-size:23px;font-weight:bold;color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.itemline{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.itemline:last-child{border:0}.itemline button{padding:7px 9px;border:0;border-radius:7px;background:#fbe8e9;color:var(--red);font-weight:bold}
+.pill{display:inline-block;background:#fbe8e9;color:var(--red);padding:5px 8px;border-radius:99px;font-size:11px;font-weight:bold}
+.empty{color:var(--muted);text-align:center;padding:20px 8px;font-size:13px}
+footer{text-align:center;color:#9297a0;font-size:11px;padding:14px}
+@media(min-width:560px){nav{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="brand">PERSONAL SERVICE ADVISOR TOOL</div><h1>TVS WORK MASTER</h1><p>Parts prices • Service charges • Job cards • Warranty</p></header>
+<nav>
+<button class="active" data-tab="prices">Prices</button><button data-tab="calculator">Calculator</button><button data-tab="jobs">Job Cards</button><button data-tab="warranty">Warranty</button><button data-tab="records">Records</button><button data-tab="settings">Edit Prices</button>
+</nav>
+<main>
+<section id="prices" class="panel active">
+<div class="card"><h2>Parts & Service Price List</h2><label>Search vehicle</label><input id="priceSearch" placeholder="Search XL100, Jupiter, Raider..." oninput="renderPrices()"><label>Vehicle model</label><select id="priceVehicle" onchange="renderPrices()"></select><div id="priceDetails"></div></div>
+<div class="card"><span class="pill">Important</span><p class="small">Prices below are based on the details you supplied. Please verify with your current dealership price list before billing. You can edit prices in “Edit Prices”.</p></div>
+</section>
+<section id="calculator" class="panel">
+<div class="card"><h2>Service Cost Calculator</h2>
+<label>Vehicle</label><select id="calcVehicle" onchange="calcRender()"></select>
+<label>Service type</label><select id="serviceType" onchange="calcRender()"><option value="free">Free service</option><option value="paid">Paid service</option></select>
+<div id="calcItems"></div>
+<label>Extra charges (₹)</label><input type="number" id="extra" value="0" min="0" oninput="calcTotal()">
+<label>Discount (₹)</label><input type="number" id="discount" value="0" min="0" oninput="calcTotal()">
+<div class="itemline"><span>Estimated total</span><span id="grandTotal" class="total">₹0</span></div>
+<button class="primary" onclick="saveEstimate()">Save estimate to records</button></div>
+</section>
+<section id="jobs" class="panel">
+<div class="card"><h2>New Job Card Note</h2>
+<label>Job card number</label><input id="jobNo" placeholder="Enter job card number">
+<div class="row"><div><label>Customer name</label><input id="jobCustomer" placeholder="Customer name"></div><div><label>Vehicle model</label><select id="jobVehicle"></select></div></div>
+<label>Customer voice / complaint</label><textarea id="jobComplaint" placeholder="Customer's complaint..."></textarea>
+<label>Failure symptoms</label><textarea id="jobSymptoms" placeholder="Symptoms observed..."></textarea>
+<label>Technician observation / action</label><textarea id="jobObservation" placeholder="Finding, parts replaced, repair done..."></textarea>
+<label>Final status</label><select id="jobStatus"><option>Pending</option><option>In progress</option><option>Completed</option></select>
+<button class="primary" onclick="saveJob()">Save job card</button></div>
+<div class="card"><h2>Saved Job Cards</h2><div id="jobList"></div></div>
+</section>
+<section id="warranty" class="panel">
+<div class="card"><h2>Warranty Record</h2>
+<label>Job card / claim number</label><input id="warNo" placeholder="Job card or claim number">
+<div class="row"><div><label>Vehicle model</label><select id="warVehicle"></select></div><div><label>Part name</label><input id="warPart" placeholder="e.g. Head valve"></div></div>
+<label>Customer complaint</label><textarea id="warComplaint" placeholder="Complaint reported by customer"></textarea>
+<label>Failure / technician finding</label><textarea id="warFinding" placeholder="e.g. Head valves found bent"></textarea>
+<label>Action taken</label><textarea id="warAction" placeholder="Part replaced / repair details"></textarea>
+<button class="primary" onclick="saveWarranty()">Save warranty record</button></div>
+<div class="card"><h2>Saved Warranty Records</h2><div id="warrantyList"></div></div>
+</section>
+<section id="records" class="panel"><div class="card"><h2>Saved Records</h2><p class="small">Your records are stored on this phone/browser. Use Export Backup regularly to keep a copy.</p><button class="primary" onclick="exportData()">Export backup (JSON)</button><label>Restore backup file</label><input type="file" id="importFile" accept=".json,application/json" onchange="importData(event)"><div id="recordSummary"></div><button class="secondary" onclick="clearRecords()" style="margin-top:14px">Delete all saved records</button></div></section>
+<section id="settings" class="panel"><div class="card"><h2>Edit Parts & Charges</h2><p class="small">Update the amounts to match your dealership's current price list.</p><label>Vehicle</label><select id="editVehicle" onchange="loadEdit()"></select>
+<div id="editFields"></div><button class="primary" onclick="savePrices()">Save price changes</button><button class="secondary" onclick="resetPrices()" style="width:100%;margin-top:8px">Restore starting prices</button></div></section>
+</main><footer>TVS WORK MASTER • Offline-first personal tool • Not an official TVS Motor Company app</footer>
+<script>
+const starter = [
+ {name:"XL100",oil:590,filter:60,flush:100,polish:25,chain:0,paidLabour:383,freeLabour:0,wash:true},
+ {name:"Jupiter 110 / 125",oil:675,filter:60,flush:100,polish:25,chain:0,paidLabour:531,freeLabour:0,wash:true},
+ {name:"NTORQ 125 / 150",oil:675,filter:60,flush:100,polish:25,chain:0,paidLabour:531,freeLabour:0,wash:true},
+ {name:"Pep+ / Zest 110",oil:675,filter:60,flush:100,polish:25,chain:0,paidLabour:531,freeLabour:0,wash:true},
+ {name:"Sport 110 / Radeon 110",oil:625,filter:60,flush:100,polish:25,chain:0,paidLabour:531,freeLabour:0,wash:true},
+ {name:"Raider 125",oil:625,filter:60,flush:100,polish:25,chain:130,paidLabour:531,freeLabour:0,wash:true},
+ {name:"Apache RTR 160 4V",oil:1200,filter:60,flush:100,polish:25,chain:130,paidLabour:531,freeLabour:0,wash:true},
+ {name:"Apache RTR 2V",oil:1000,filter:60,flush:100,polish:25,chain:130,paidLabour:531,freeLabour:0,wash:true},
+ {name:"Ronin 225",oil:1400,filter:60,flush:100,polish:25,chain:130,paidLabour:531,freeLabour:0,wash:true}
+];
+let prices = JSON.parse(localStorage.getItem("twm_prices")||"null") || starter.map(x=>({...x}));
+let jobs = JSON.parse(localStorage.getItem("twm_jobs")||"[]");
+let warranties = JSON.parse(localStorage.getItem("twm_warranties")||"[]");
+let records = JSON.parse(localStorage.getItem("twm_records")||"[]");
+let selectedItems = {};
+function persist(){localStorage.setItem("twm_prices",JSON.stringify(prices));localStorage.setItem("twm_jobs",JSON.stringify(jobs));localStorage.setItem("twm_warranties",JSON.stringify(warranties));localStorage.setItem("twm_records",JSON.stringify(records));}
+function fillSelect(id){const el=document.getElementById(id);if(!el)return;el.innerHTML=prices.map((p,i)=>`<option value="${i}">${esc(p.name)}</option>`).join('');}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById(b.dataset.tab).classList.add("active");refresh();});
+function refresh(){renderPrices();calcRender();renderJobs();renderWarranties();renderSummary();loadEdit();}
+function renderPrices(){let idx=Number(document.getElementById("priceVehicle").value||0);let q=(document.getElementById("priceSearch").value||"").toLowerCase();let opts=prices.map((p,i)=>({p,i})).filter(x=>x.p.name.toLowerCase().includes(q));let sel=document.getElementById("priceVehicle");if(q&&opts.length){sel.innerHTML=opts.map(x=>`<option value="${x.i}">${esc(x.p.name)}</option>`).join("");idx=opts[0].i;}else if(!q){sel.innerHTML=prices.map((p,i)=>`<option value="${i}">${esc(p.name)}</option>`).join("");idx=Number(sel.value||0);}if(!prices[idx])return;let p=prices[idx];document.getElementById("priceDetails").innerHTML=`<div class="itemline"><span>Engine oil</span><b>${money(p.oil)}</b></div><div class="itemline"><span>Oil filter</span><b>${money(p.filter)}</b></div><div class="itemline"><span>Flush</span><b>${money(p.flush)}</b></div><div class="itemline"><span>Polish</span><b>${money(p.polish)}</b></div>${p.chain?`<div class="itemline"><span>Chain lubrication</span><b>${money(p.chain)}</b></div>`:""}<div class="itemline"><span>Paid service labour</span><b>${money(p.paidLabour)}</b></div><div class="itemline"><span>Free service labour</span><b>${money(p.freeLabour)}</b></div><div class="itemline"><span>Water wash</span><b>${p.wash?"Included":"Not included"}</b></div>`;}
+function calcRender(){let i=Number(document.getElementById("calcVehicle").value||0),p=prices[i];if(!p)return;let type=document.getElementById("serviceType").value;let items=[["Engine oil",p.oil],["Oil filter",p.filter],["Flush",p.flush],["Polish",p.polish]];if(p.chain)items.push(["Chain lubrication",p.chain]);if(type==="paid")items.push(["Labour charges",p.paidLabour]);else items.push(["Labour charges",p.freeLabour]);selectedItems={};document.getElementById("calcItems").innerHTML=items.map((it,n)=>{selectedItems[n]={name:it[0],price:it[1],checked:true};return `<label style="display:flex;align-items:center;gap:8px;font-size:14px;color:#252a32"><input type="checkbox" checked style="width:auto" onchange="toggleItem(${n},this.checked)"> ${esc(it[0])}<span style="margin-left:auto;font-weight:bold">${money(it[1])}</span></label>`}).join("");calcTotal();}
+function toggleItem(n,on){selectedItems[n].checked=on;calcTotal();}
+function calcTotal(){let sub=Object.values(selectedItems).filter(x=>x.checked).reduce((a,x)=>a+Number(x.price||0),0);let ex=Number(document.getElementById("extra").value||0),dis=Number(document.getElementById("discount").value||0);document.getElementById("grandTotal").textContent=money(Math.max(0,sub+ex-dis));}
+function saveEstimate(){let total=document.getElementById("grandTotal").textContent;let item={type:"Estimate",date:new Date().toLocaleString(),vehicle:prices[Number(document.getElementById("calcVehicle").value||0)].name,service:document.getElementById("serviceType").value,total,items:Object.values(selectedItems).filter(x=>x.checked).map(x=>x.name)};records.unshift(item);persist();renderSummary();alert("Estimate saved.");}
+function saveJob(){let j={id:Date.now(),date:new Date().toLocaleString(),no:val("jobNo"),customer:val("jobCustomer"),vehicle:prices[Number(val("jobVehicle")||0)].name,complaint:val("jobComplaint"),symptoms:val("jobSymptoms"),observation:val("jobObservation"),status:val("jobStatus")};if(!j.no&&!j.customer&&!j.complaint){alert("Enter at least a job card number, customer, or complaint.");return;}jobs.unshift(j);persist();["jobNo","jobCustomer","jobComplaint","jobSymptoms","jobObservation"].forEach(id=>document.getElementById(id).value="");renderJobs();alert("Job card saved on this device.");}
+function renderJobs(){let el=document.getElementById("jobList");if(!jobs.length){el.innerHTML='<div class="empty">No job cards saved yet.</div>';return;}el.innerHTML=jobs.map(j=>`<div class="itemline" style="display:block"><b>${esc(j.no||"No job number")} · ${esc(j.vehicle)}</b><div class="small">${esc(j.date)} · ${esc(j.status)}</div><p class="small">${esc(j.customer)} — ${esc(j.complaint)}</p><p class="small">Symptoms: ${esc(j.symptoms)}<br>Action: ${esc(j.observation)}</p><button class="secondary" onclick="deleteJob(${j.id})">Delete</button></div>`).join("");}
+function deleteJob(id){if(confirm("Delete this job card?")){jobs=jobs.filter(j=>j.id!==id);persist();renderJobs();}}
+function saveWarranty(){let w={id:Date.now(),date:new Date().toLocaleString(),no:val("warNo"),vehicle:prices[Number(val("warVehicle")||0)].name,part:val("warPart"),complaint:val("warComplaint"),finding:val("warFinding"),action:val("warAction")};if(!w.no&&!w.part&&!w.complaint){alert("Enter a claim/job number, part, or complaint.");return;}warranties.unshift(w);persist();["warNo","warPart","warComplaint","warFinding","warAction"].forEach(id=>document.getElementById(id).value="");renderWarranties();alert("Warranty record saved.");}
+function renderWarranties(){let el=document.getElementById("warrantyList");if(!warranties.length){el.innerHTML='<div class="empty">No warranty records saved yet.</div>';return;}el.innerHTML=warranties.map(w=>`<div class="itemline" style="display:block"><b>${esc(w.no||"Warranty record")} · ${esc(w.part)}</b><div class="small">${esc(w.date)} · ${esc(w.vehicle)}</div><p class="small">Complaint: ${esc(w.complaint)}<br>Finding: ${esc(w.finding)}<br>Action: ${esc(w.action)}</p><button class="secondary" onclick="deleteWarranty(${w.id})">Delete</button></div>`).join("");}
+function deleteWarranty(id){if(confirm("Delete this warranty record?")){warranties=warranties.filter(w=>w.id!==id);persist();renderWarranties();}}
+function val(id){return document.getElementById(id).value.trim();}
+function renderSummary(){let el=document.getElementById("recordSummary");if(el)el.innerHTML=`<div class="itemline"><span>Saved job cards</span><b>${jobs.length}</b></div><div class="itemline"><span>Warranty records</span><b>${warranties.length}</b></div><div class="itemline"><span>Saved estimates</span><b>${records.length}</b></div>`;}
+function loadEdit(){let i=Number(document.getElementById("editVehicle").value||0),p=prices[i];if(!p)return;let fields=[["oil","Engine oil"],["filter","Oil filter"],["flush","Flush"],["polish","Polish"],["chain","Chain lubrication"],["paidLabour","Paid service labour"],["freeLabour","Free service labour"]];document.getElementById("editFields").innerHTML=fields.map(([k,n])=>`<label>${n} (₹)</label><input type="number" min="0" id="edit_${k}" value="${p[k]||0}">`).join("")+`<label>Water wash</label><select id="edit_wash"><option value="true" ${p.wash?"selected":""}>Included</option><option value="false" ${!p.wash?"selected":""}>Not included</option></select>`;}
+function savePrices(){let i=Number(document.getElementById("editVehicle").value||0);["oil","filter","flush","polish","chain","paidLabour","freeLabour"].forEach(k=>prices[i][k]=Number(document.getElementById("edit_"+k).value||0));prices[i].wash=document.getElementById("edit_wash").value==="true";persist();refresh();alert("Prices updated.");}
+function resetPrices(){if(confirm("Restore the original starting prices? This will replace your edited prices.")){prices=starter.map(x=>({...x}));persist();init();alert("Starting prices restored.");}}
+function exportData(){let blob=new Blob([JSON.stringify({prices,jobs,warranties,records},null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tvs-work-master-backup.json";a.click();URL.revokeObjectURL(a.href);}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(d.prices)prices=d.prices;if(d.jobs)jobs=d.jobs;if(d.warranties)warranties=d.warranties;if(d.records)records=d.records;persist();init();alert("Backup restored.");}catch(err){alert("That backup file could not be read.");}};r.readAsText(f);}
+function clearRecords(){if(confirm("Delete ALL saved job cards, warranty records, estimates and edited prices? Export a backup first if needed.")){jobs=[];warranties=[];records=[];persist();renderJobs();renderWarranties();renderSummary();}}
+function init(){["priceVehicle","calcVehicle","jobVehicle","warVehicle","editVehicle"].forEach(fillSelect);refresh();}
+if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("./sw.js").catch(()=>{});
+init();
+</script>
+</body></html>
